@@ -89,6 +89,5 @@ fastlane/test_output
 
 iOSInjectionProject/
 
-Supporting Files/
 GoogleService-Info.plist
 APIService-Info.plist
