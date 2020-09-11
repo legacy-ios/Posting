@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 extension UIView {
     func anchor(top: NSLayoutYAxisAnchor? = nil,
@@ -92,5 +93,61 @@ extension UIView {
         
         anchor(top: superviewTopAnchor, left: superviewLeadingAnchor,
                bottom: superviewBottomAnchor, right: superviewTrailingAnchor)
+    }
+}
+
+extension UIImageView {
+    
+    struct ImageCache {
+        static let cache = NSCache<AnyObject, AnyObject>()
+    }
+    
+    func loadImage(urlString: String) {
+        
+        image = nil
+        
+        if let imageFromCache = ImageCache.cache.object(forKey: urlString as AnyObject) {
+            image = imageFromCache as? UIImage
+            return
+        }
+        
+        DispatchQueue.global().async { [weak self] in
+            if let url = URL(string: urlString), let data = try? Data(contentsOf: url) {
+                
+                if let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self?.image = image
+                        ImageCache.cache.setObject(image, forKey: url.absoluteString as AnyObject)
+                    }
+                }
+            }
+        }
+    }
+}
+
+extension Database {
+    static func fetchUser(with uid: String, completion: @escaping(User) -> Void) {
+        USER_REF.child(uid).observeSingleEvent(of: .value) { snapshot in
+            guard let dictionary = snapshot.value as? Dictionary<String, AnyObject> else { return }
+            let user = User(uid: uid, dictionary: dictionary)
+            completion(user)
+            
+        }
+    }
+    
+    static func fetchPost(with postId: String, completion: @escaping(Post) -> Void) {
+        
+        POSTS_REF.child(postId).observeSingleEvent(of: .value) { snapshot in
+            
+            guard let dictionary = snapshot.value as? Dictionary<String, AnyObject> else { return }
+            
+            guard let ownerUid = dictionary["ownerUid"] as? String else { return }
+            
+            Database.fetchUser(with: ownerUid) { user in
+                let post = Post(postId: postId, user: user, dictionary: dictionary)
+                completion(post)
+            }
+            
+        }
     }
 }
