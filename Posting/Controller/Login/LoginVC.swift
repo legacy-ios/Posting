@@ -15,12 +15,12 @@ class LoginVC: UIViewController {
 
     private let logoContainerView: UIView = {
         let view = UIView()
-        let logoImageView = UIImageView(image: #imageLiteral(resourceName: "Instagram_logo_white"))
-        logoImageView.contentMode = .scaleAspectFill
-        view.addSubview(logoImageView)
+        //let logoImageView = UIImageView(image: #imageLiteral(resourceName: "Instagram_logo_white"))
+        //logoImageView.contentMode = .scaleAspectFill
+        //view.addSubview(logoImageView)
         view.backgroundColor = UIColor(red: 0/255, green: 120/255, blue: 175/255, alpha: 1)
-        logoImageView.centerX(inView: view)
-        logoImageView.centerY(inView: view)
+        //logoImageView.centerX(inView: view)
+        //logoImageView.centerY(inView: view)
         return view
     }()
     
